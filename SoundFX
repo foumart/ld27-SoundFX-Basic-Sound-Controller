@@ -30,7 +30,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package ld27.sound {
+package ld27 {
 	
 	/**
 	* 	SoundFX - Basic Sound Controller prepared for LD27
