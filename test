@@ -314,9 +314,8 @@ package dungeonScreener {//2493
 				} else if(UnitStat.characters[i] == UnitType.TROLL || UnitStat.characters[i] == UnitType.SLIME){
 					hb = new BlueHeart();
 					hb.scaleX = 0.85; hb.scaleY = 0.75; hb.x=42+j*14; hb.y=9;
-					thumb.addChild(hb);
-				} else if(UnitStat.characters[i] == UnitType.LICH || UnitStat.characters[i] == UnitType.BLOOD_ACOLYTE || UnitStat.characters[i] == UnitType.SKELETON || UnitStat.characters[i] == UnitType.ZOMBIE
-						  || UnitStat.characters[i] == UnitType.PHANTOM || UnitStat.characters[i] == UnitType.DEATH_KNIGHT || UnitStat.characters[i] == UnitType.GHOST || UnitStat.characters[i] == UnitType.WRAITH){
+					thumb.addChild(hb);//|| UnitStat.characters[i] == UnitType.SKELETON || UnitStat.characters[i] == UnitType.ZOMBIE || UnitStat.characters[i] == UnitType.GHOST || UnitStat.characters[i] == UnitType.WRAITH
+				} else if(UnitStat.characters[i] == UnitType.LICH || UnitStat.characters[i] == UnitType.BLOOD_ACOLYTE || UnitStat.characters[i] == UnitType.PHANTOM || UnitStat.characters[i] == UnitType.DEATH_KNIGHT){
 					hr = new GreyHeart();
 					hr.scaleX = 0.85; hr.scaleY = 0.75; hr.x=42+j*14; hr.y=9;
 					thumb.addChild(hr);
@@ -643,13 +642,31 @@ package dungeonScreener {//2493
 				_options.intro = Local.vars.intro;
 				_options.revive = Local.vars.revive;
 				_options.bonus = Local.vars.bonus;
+				_options.difficulty = Local.vars.difficulty;
 				panel.settings.intr.bonus = _options.bonus;
+				_global.game.superInsane = _options.difficulty;
 				//if(panel.settings.intr.bonus_mc) panel.settings.intr.bonus_mc.gotoAndStop(panel.settings.intr.bonus);
 				if(_options.scanLines) _global.game.drawScanLines();
 				//if(!soundMuted) SoundEffect.init();
 				//if(!musicMuted)
 				SoundFX.playMusic("FX_intro", 1, SoundFX.REPLAY);
-				//Tween.delay(15, action,UnitType.KNIGHT);
+				
+				_global.game.createDungeon();
+				
+				/*panel.dusc_mc.gotoAndStop(1);
+				panel.dusc_mc.gold_txt.text="";
+				panel.dusc_mc.gold_txt.visible = false;
+				panel.dusc_mc.score_mc.visible = false;
+				panel.overlay.globalScoreBrowser.visible = false;
+				panel.overlay.globalScoreBrowser.enter.visible = false;
+				panel.overlay.globalScoreBrowser.enter.loading_bar.visible = false;
+				panel.overlay.globalScoreBrowser.enter.retry_btn.visible = false;
+				panel.overlay.globalScoreBrowser.entry.visible = false;
+				mainMenu();
+				_global.game.locked = true;*/
+				
+				_global.shell.gameReady();
+				_global.shell.requestGlobalScores();
 			}
 			
 			panel.shield.visible = false;
@@ -1222,13 +1239,13 @@ package dungeonScreener {//2493
 						}
 					} else if(_global.panel.panel.cards.visible) {
 						_global.shell.track("CARDS left");
-					} else if(panel.overlay.index<2 && (Local.vars.slot0 || (Local.vars.slot1&&_options.debug.cheat))){
+					} /*else if(panel.overlay.index<2 && (Local.vars.slot0 || (Local.vars.slot1&&_options.debug.cheat))){
 						panel.overlay.hideMcs();
 						panel.overlay.btns[panel.overlay.index].visible = false;
 						if(panel.overlay.index==1) panel.overlay.index = 0 else panel.overlay.index = 1;
 						panel.overlay.mcs[panel.overlay.index].visible = true;
 						panel.overlay.btns[panel.overlay.index].visible = true;
-					} else if(panel.overlay.globalScoreBrowser.id>0 && panel.overlay.globalScoreBrowser.bgr.daily.visible){
+					} */else if(panel.overlay.globalScoreBrowser.id>0 && panel.overlay.globalScoreBrowser.bgr.daily.visible){
 						updateGlobalScoreBrowser(panel.overlay.globalScoreBrowser.id, -1);
 					}
 					return;
@@ -1264,14 +1281,14 @@ package dungeonScreener {//2493
 						}
 					} else if(_global.panel.panel.cards.visible) {
 						_global.shell.track("CARDS right");
-					} else if(panel.overlay.index<2 && (Local.vars.slot0 || (Local.vars.slot1&&_options.debug.cheat))){
+					}/* else if(panel.overlay.index<2 && (Local.vars.slot0 || (Local.vars.slot1&&_options.debug.cheat))){
 						panel.overlay.hideMcs();
 						panel.overlay.btns[panel.overlay.index].visible = false;
 						if(panel.overlay.index==1) panel.overlay.index = 0 else panel.overlay.index = 1;
 						//panel.overlay.hideMcs();
 						panel.overlay.mcs[panel.overlay.index].visible = true;
 						panel.overlay.btns[panel.overlay.index].visible = true;
-					} else if(panel.overlay.globalScoreBrowser.id<11 && panel.overlay.globalScoreBrowser.bgr.daily.visible){
+					}*/ else if(panel.overlay.globalScoreBrowser.id<11 && panel.overlay.globalScoreBrowser.bgr.daily.visible){
 						updateGlobalScoreBrowser(panel.overlay.globalScoreBrowser.id, 1);
 					}
 					return;
@@ -2069,6 +2086,9 @@ package dungeonScreener {//2493
 				panel.overlay.gotoAndStop(9);
 				if(!_options.intro) playEntranceAnimation();
 			} else if(_in == "start_btn"){
+				
+				_global.game.createDungeon(true);
+				
 				addText("");
 				addText("");
 				addText("<font color='#6699dd'>Started a new game.</font>");
@@ -2124,7 +2144,7 @@ package dungeonScreener {//2493
 				}
 			}
 		}
-		public function overlayClick(evt:Object = null):void{//trace("overlayClick", tutorialState, _global.game.schedule, panel.overlay.currentFrame, questions.indexOf(activeQuestion), gameOverlay.currentLabel);
+		public function overlayClick(evt:Object = null):void{trace("overlayClick", tutorialState, _global.game.schedule, panel.overlay.currentFrame, questions.indexOf(activeQuestion), gameOverlay.currentLabel);
 			/*if(gameOverlay.currentLabel == "king"){//bug.. handling
 				hideOverlay();
 				//trace()
@@ -2444,6 +2464,12 @@ package dungeonScreener {//2493
 		}
 		public function descendQuestion(_prev:Boolean = false):void{//addText("<font color='#00ff00'>Descend: "+_prev+","+_global.game.level+","+gameOverlay.idle+","+gameOverlay.currentLabel+","+gameOverlay.currentFrame+"</font>");//trace("descendQuestion", _prev, _global.game.level, gameOverlay.idle, gameOverlay.currentLabel, gameOverlay.currentFrame)
 			_global.shell.track("descendQuestion", _global.game.level, gameOverlay.idle);
+			if(_global.game.level==4 /*&& !_global.playerGroup.leftDeath*/){
+				//_global.shell.track("unexpected event 09");
+removeQuestion();
+_global.game.endGame(true);
+//questions[12].yes();//endgame
+			}
 			if(!gameOverlay.idle) return;
 			if(_prev){
 				tutorialState = 0;
@@ -2464,12 +2490,7 @@ package dungeonScreener {//2493
 			} else {
 				addText("<font color='#6699dd'>Entered "+ItemType.NAMES[32+_global.game.level+1]+".</font>");
 			}
-			if(_global.game.level==4 /*&& !_global.playerGroup.leftDeath*/){
-				_global.shell.track("unexpected event 09");
-//removeQuestion();
-//_global.game.endGame(true);
-////questions[12].yes();//endgame
-			} else questions[_global.game.level+1].yes();
+			if(_global.game.level<4) questions[_global.game.level+1].yes();
 		}
 		private function shopBackHelper():void{
 			gameOverlay.alpha = 0;
@@ -2623,13 +2644,22 @@ package dungeonScreener {//2493
 					addText("");
 					_global.game.topExp += 250; _global.playerGroup.topUnit.gainExperience(250); _global.game.loot.push(ItemType.GLOVES);
 					_global.game.score -= ((shop.prev)?prices[0].prev:prices[0].price);
-					Tween.delay(5, action,UnitType.KNIGHT);
-					Tween.delay(10, action,UnitType.KNIGHT);
 					prices[0].have = true;
 					setShop(_global.game.level, shop.prev, false);
 					setScore(_global.playerGroup);
 					_global.game.setHealth();
 					shop.setUp();
+					if(knightAction == Action.ATTACK){
+						if(_global.playerGroup.topAction){
+							_global.playerGroup.topAttack = knightFullAttack();
+							_global.game.setHealth();
+						} else {
+							_global.playerGroup.topAttack = knightHalfAttack();
+							_global.game.setHealth();
+						}
+					}
+					Tween.delay(10, action,UnitType.KNIGHT);
+					Tween.delay(20, action,UnitType.KNIGHT);
 					break;
 				case 2:
 					_global.playerGroup.cloak.visible = true;
@@ -2710,18 +2740,26 @@ package dungeonScreener {//2493
 					addText("<font color='#ffffff'><b>"+_global.game.getName("Ranger",0x66ff66)+"<font color='#cccccc'> bought the </font>Shadow Blade! +1250 exp.</b></font>");
 					addText("<font color='#ffffff'>  | +<b>1</b> to Attack</font>");
 					addText("<font color='#ffffff'>  | +<b>15%</b> to Critical Hit chance</font>");
-					addText("<font color='#ffffff'>  ^ +<b>10%</b> to Dodge ranged attack ability</font>");
+					addText("<font color='#ffffff'>  ^ +<b>10%</b> to Dodge ranged attack</font>");
 					addText("");
 					_global.game.rightExp += 1250; _global.playerGroup.rightUnit.gainExperience(1250); _global.game.loot.push(ItemType.SWORD_6);
-					Tween.delay(5, action,UnitType.RANGER);
-					Tween.delay(10, action,UnitType.RANGER);
-					//if(playerGroup.topDefense < 3) playerGroup.topDefense += 1;
 					_global.game.score -= ((shop.prev)?prices[5].prev:prices[5].price);
 					prices[5].have = true;
 					setShop(_global.game.level, shop.prev, false);
 					setScore(_global.playerGroup);
 					_global.game.setHealth();
 					shop.setUp();
+					if(rangerAction == Action.BOW){
+						if(_global.playerGroup.rightAction){
+							_global.playerGroup.rightAttack = rangerFullAttack();
+							_global.game.setHealth();
+						} else {
+							_global.playerGroup.rightAttack = rangerHalfAttack();
+							_global.game.setHealth();
+						}
+					}
+					Tween.delay(10, action,UnitType.RANGER);
+					Tween.delay(20, action,UnitType.RANGER);
 					break;
 				case 7:
 					_global.playerGroup.sword.visible = true;//playerGroup.sword.alpha = 0.8;
@@ -2729,12 +2767,11 @@ package dungeonScreener {//2493
 					Tracker.trackEvent("Game", "Bought Crystal Sword", _global.game.getOverallScore());
 					if(texts[texts.length-1].length>1) addText("");
 					addText("<font color='#ffffff'><b>"+_global.game.getName("Knight",0x66ff66)+"<font color='#cccccc'> bought the </font>Crystal Sword! +1500 exp.</b></font>");
-					addText("<font color='#ffffff'>  | +<b>1</b> to Attack</font>");
-					addText("<font color='#ffffff'>  ^ +<b>15%</b> to Critical Hit chance</font>");
+					addText("<font color='#ffffff'>  | Critical hit Warlord, Valkarie and Dread Knight</font>");
+					addText("<font color='#ffffff'>  | +<b>15%</b> to Critical Hit chance</font>");
+					addText("<font color='#ffffff'>  ^ +<b>1</b> to Attack</font>");
 					addText("");
 					_global.game.topExp += 1500; _global.playerGroup.topUnit.gainExperience(1500); _global.game.loot.push(ItemType.SWORD_4);
-					Tween.delay(5, action,UnitType.KNIGHT);
-					Tween.delay(10, action,UnitType.KNIGHT);
 					//if(playerGroup.topDefense < 3) playerGroup.topDefense += 1;
 					_global.game.score -= ((shop.prev)?prices[6].prev:prices[6].price);
 					prices[6].have = true;
@@ -2742,33 +2779,54 @@ package dungeonScreener {//2493
 					setScore(_global.playerGroup);
 					_global.game.setHealth();
 					shop.setUp();
+					if(knightAction == Action.ATTACK){
+						if(_global.playerGroup.topAction){
+							_global.playerGroup.topAttack = knightFullAttack();
+							_global.game.setHealth();
+						} else {
+							_global.playerGroup.topAttack = knightHalfAttack();
+							_global.game.setHealth();
+						}
+					}
+					Tween.delay(10, action,UnitType.KNIGHT);
+					Tween.delay(20, action,UnitType.KNIGHT);
 					break;
 				case 8:
 					_global.playerGroup.shield.visible = true;//playerGroup.sword.alpha = 0.8;
-					_global.playerGroup.shield.gotoAndStop(4);
 					Tracker.trackEvent("Game", "Bought Diamond Shield", _global.game.getOverallScore());
 					if(texts[texts.length-1].length>1) addText("");
 					addText("<font color='#ffffff'><b>"+_global.game.getName("Knight",0x66ff66)+"<font color='#cccccc'> bought the </font>Diamond Shield! +1000 exp.</b></font>");
-					addText("<font color='#ffffff'>  | + <b>Protection</b> from critical hits</font>");
+					if(_global.playerGroup.shield.currentFrame==1) addText("<font color='#ffffff'>  | + <b>Protection</b> from critical hits</font>");
+					if(_global.playerGroup.shield.currentFrame<3) addText("<font color='#ffffff'>  | + <b>Protection</b> from headshots</font>");
 					addText("<font color='#ffffff'>  | +<b>1</b> to Resistance</font>");
 					addText("<font color='#ffffff'>  ^ +<b>1</b> to Shield Bash damage</font>");
 					addText("");
+					_global.playerGroup.shield.gotoAndStop(4);
 					_global.game.topExp += 1000; _global.playerGroup.topUnit.gainExperience(1000); _global.game.loot.push(ItemType.SHIELD_4);
-					Tween.delay(5, action,UnitType.KNIGHT);
-					Tween.delay(10, action,UnitType.KNIGHT);
 					_global.game.score -= ((shop.prev)?prices[7].prev:prices[7].price);
 					prices[7].have = true;
 					setShop(_global.game.level, shop.prev, false);
 					setScore(_global.playerGroup);
 					_global.game.setHealth();
 					shop.setUp();
+					if(knightAction == Action.ATTACK){
+						if(_global.playerGroup.topAction){
+							_global.playerGroup.topAttack = knightFullAttack();
+							_global.game.setHealth();
+						} else {
+							_global.playerGroup.topAttack = knightHalfAttack();
+							_global.game.setHealth();
+						}
+					}
+					Tween.delay(10, action,UnitType.KNIGHT);
+					Tween.delay(20, action,UnitType.KNIGHT);
 					break;
 				case 9:
 					_global.playerGroup.ring.visible = true;
 					Tracker.trackEvent("Game", "Bought Dragon Ring", _global.game.getOverallScore());
 					if(texts[texts.length-1].length>1) addText("");
 					addText("<font color='#ffffff'><b>"+_global.game.getName("Wizard",0x66ff66)+"<font color='#cccccc'> bought a </font>Dragon Ring! +5000 exp.</b></font>");
-					addText("<font color='#ffffff'>  ^ + <b>Ingore Natural Resistance</b></font>");
+					addText("<font color='#ffffff'>  ^ Ingore magic resistance (except Dragon, Mage & Dungeon Lord)</font>");
 					addText("");
 					_global.game.rightExp += 5000; _global.playerGroup.rightUnit.gainExperience(5000); _global.game.loot.push(ItemType.RING);
 					_global.game.score -= ((shop.prev)?prices[8].prev:prices[8].price);
@@ -2862,7 +2920,7 @@ package dungeonScreener {//2493
 			panel.dusc_mc.gold_txt.visible = true;
 			if(_setScore) setScore(_global.playerGroup);
 		}
-		private function dontStartNewGame():void{
+		private function dontStartNewGame():void{_global.shell.track("dontStartNewGame");
 			_global.game.schedule = "endgame";
 			if(_global.shell.scoreOverlay) {
 				_global.shell.scoreOverlay.visible = true;
@@ -2884,7 +2942,7 @@ package dungeonScreener {//2493
 		private function startNewGame():void{
 			Tween.delay(1, startGameHelper);
 		}
-		public function consoleReset(evt:MouseEvent):void{_global.shell.track("consoleReset",_global.game.schedule, panel.overlay.globalScoreBrowser.enter.visible, panel.overlay.globalScoreBrowser.posted)
+		public function consoleReset(evt:MouseEvent):void{_global.shell.track("consoleReset",_global.game.schedule, panel.overlay.globalScoreBrowser.enter.visible, panel.overlay.globalScoreBrowser.posted);
 			if(_global.game.schedule == "endgame"){
 				if(!panel.overlay.globalScoreBrowser.posted){ // need better check if score posted or not
 					hideScroll();
@@ -2912,6 +2970,8 @@ package dungeonScreener {//2493
 				_global.game.overlay.alpha = 1;
 				activeQuestion = null;
 				_global.game.overlay.alpha = 1;
+			} else {_global.shell.track("consoleReset????");
+				//return;
 			}
 			panel.console.bgr.removeEventListener(MouseEvent.CLICK, consoleReset);
 			panel.console.bgr.addEventListener(MouseEvent.CLICK, consoleClick);
@@ -3628,10 +3688,10 @@ package dungeonScreener {//2493
 			return knightFullAttack() + ((_global.game.topExp>=200000)?1:0) - ((_global.game.shield.currentFrame==1||_global.game.shield.currentFrame==4)?1:((_global.game.shield.currentFrame==5)?2:_global.game.shield.currentFrame));//+int(_global.game.shield.currentFrame/4)
 		}
 		public function rangerFullAttack():int{
-			return 2 + _global.game.bow.currentFrame + ((_global.game.rightExp>=50000 || _global.game.loot.indexOf(ItemType.SWORD_5)>-1)?1:0) + ((_global.game.rightExp>=200000)?1:0);
+			return 2 + _global.game.bow.currentFrame + ((_global.game.rightExp>=50000 /*|| _global.game.loot.indexOf(ItemType.SWORD_5)>-1*/)?1:0) + ((_global.game.rightExp>=200000)?1:0);
 		}
 		public function rangerHalfAttack():int{
-			return 1 + ((_global.game.loot.indexOf(ItemType.SWORD_5)>-1||_global.game.rightExp>=200000)?1:0) + ((_global.game.loot.indexOf(ItemType.SWORD)>-1)?1:0) + ((_global.game.loot.indexOf(ItemType.SWORD_6)>-1)?1:0) + ((_global.game.rightExp>=50000)?1:0) + ((_global.game.rightExp>=2500)?1:0);
+			return 1 + ((_global.game.loot.indexOf(ItemType.SWORD_5)>-1)?1:0) + ((_global.game.rightExp>=200000)?1:0) + ((_global.game.loot.indexOf(ItemType.SWORD)>-1)?1:0) + ((_global.game.loot.indexOf(ItemType.SWORD_6)>-1)?1:0) + ((_global.game.rightExp>=50000)?1:0) + ((_global.game.rightExp>=2500)?1:0);
 		}
 		public function action(_name:String, _force:Boolean = false):Boolean{//trace(_force, _global.game.flippedShield, _global.game.isInteractionAllowed());
 			switch(_name){
@@ -3864,7 +3924,8 @@ package dungeonScreener {//2493
 									cureReally = false;
 									castProtection();
 									tmp2 = Math.round(_global.randomGen.random()*4);
-									castProtection(true, ((_global.randomGen.random()*limit>6||tmp2==1)?true:false), ((_global.randomGen.random()*limit>6||tmp2==2)?true:false), ((_global.randomGen.random()*limit>6||tmp2==3)?true:false), ((_global.randomGen.random()*limit>6||tmp2==4)?true:false));
+									//castProtection(true, ((_global.randomGen.random()*limit>6||tmp2==1)?true:false), ((_global.randomGen.random()*limit>6||tmp2==2)?true:false), ((_global.randomGen.random()*limit>6||tmp2==3)?true:false), ((_global.randomGen.random()*limit>6||tmp2==4)?true:false));
+									castProtection(true, ((_global.randomGen.random()*limit>4||tmp2==1)?true:false), ((_global.randomGen.random()*limit>4||tmp2==2)?true:false), ((_global.randomGen.random()*limit>4||tmp2==3)?true:false), ((_global.randomGen.random()*limit>4||tmp2==4)?true:false));
 									_global.playerGroup.leftUnit.critical("<font color='#9966cc'>Protect!</font>");
 									addText(_global.game.getName(_global.playerGroup.leftUnit.type,0x99ff99)+" cast Protection.");
 									_global.playerGroup.leftAction-=1;
@@ -3874,7 +3935,7 @@ package dungeonScreener {//2493
 									if(cureReally) {
 										castProtection();
 										tmp2 = Math.round(_global.randomGen.random()*4);
-										castProtection(true, ((_global.randomGen.random()*limit>6||tmp2==1)?true:false), ((_global.randomGen.random()*limit>6||tmp2==2)?true:false), ((_global.randomGen.random()*limit>6||tmp2==3)?true:false), ((_global.randomGen.random()*limit>6||tmp2==4)?true:false));
+										castProtection(true, ((_global.randomGen.random()*limit>4||tmp2==1)?true:false), ((_global.randomGen.random()*limit>4||tmp2==2)?true:false), ((_global.randomGen.random()*limit>4||tmp2==3)?true:false), ((_global.randomGen.random()*limit>4||tmp2==4)?true:false));
 										_global.playerGroup.leftUnit.critical("<font color='#bb6699'>Protect!</font>");
 										addText(_global.game.getName(_global.playerGroup.leftUnit.type,0x99ff99)+" cast Protection.");
 										_global.playerGroup.leftAction-=1;
@@ -3928,7 +3989,7 @@ package dungeonScreener {//2493
 							if(tmp - revivedHealth > 0) addText(_global.game.getName(_global.playerGroup.leftUnit.type,0x99ff99)+" recovers "+(tmp-revivedHealth)+" health points total.");
 							if(tmp2>=1){
 								tmp = Math.round(_global.randomGen.random()*4);
-								castProtection(true, true, ((_global.randomGen.random()*limit<tmp2||tmp==2)?true:false), ((_global.randomGen.random()*limit<tmp2||tmp==3)?true:false), ((_global.randomGen.random()*limit<tmp2||tmp==4)?true:false));
+								castProtection(true, true, ((_global.randomGen.random()*limit>4||tmp==2)?true:false), ((_global.randomGen.random()*limit>4||tmp==3)?true:false), ((_global.randomGen.random()*limit>4||tmp==4)?true:false));
 								if(!tmp) castProtection(true, ((_global.randomGen.random()*tmp2>2)?true:false), ((_global.randomGen.random()*tmp2>3)?true:false), ((_global.randomGen.random()*tmp2>3)?true:false), ((_global.randomGen.random()*tmp2>3)?true:false))
 								if(int(_global.randomGen.random()*(tmp2/2))) castProtection();
 								if(tmp2>=4) castProtection();
@@ -4356,6 +4417,7 @@ package dungeonScreener {//2493
 			Local.vars.soundVolume = _options.soundVolume;
 			Local.vars.skipFrames = _options.skipFrames;
 			Local.vars.revive = _options.revive;
+			Local.vars.difficulty = _global.game.superInsane;
 			Local.vars.bonus = panel.settings.intr.bonus;
 			_options.bonus = Local.vars.bonus;
 			if(Local.vars.scanLines && (_global._stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE && _global._stage.displayState != StageDisplayState.FULL_SCREEN)) _global.game.drawScanLines() else _global.game.clearScanLines();
@@ -4451,7 +4513,7 @@ package dungeonScreener {//2493
 					panel.profile.stat2.htmlText = "Ranged:"+space+rangerFullAttack();
 					panel.profile.stat3.htmlText = ((!_global.game.playerGroup.rightUnit.skill)?"<font color='#888888'>":"")+"R.Def:"+space+_global.game.playerGroup.rightUnit.skill+((!_global.game.playerGroup.rightUnit.skill)?"</font>":"");
 					panel.profile.stat4.htmlText = (_global.game[which+"Exp"]<5000)?"<font color='#888888'>Quiver:"+space+"3</font>":"Quiver:"+space+"∞";
-					panel.profile.special.htmlText = (((_global.playerGroup.rightUnit.level*4+((_global.playerGroup.rightUnit.level==1)?1:0))+((_global.game.cloak.visible)?40:0)))+"%"+space+"dodge<font color='#888888'><br/>"+crit+"%"+space+"critical</font>";
+					panel.profile.special.htmlText = (((_global.playerGroup.rightUnit.level*4+((_global.playerGroup.rightUnit.level==1)?1:0))+((_global.game.loot.indexOf(ItemType.SWORD_5)>-1)?5:0)+((_global.game.loot.indexOf(ItemType.SWORD_6)>-1)?10:0)+((_global.game.cloak.visible)?40:0)))+"%"+space+"dodge<font color='#888888'><br/>"+crit+"%"+space+"critical</font>";
 				}
 				if(_global.game.loot.indexOf(ItemType.SWORD)>-1||_global.game.loot.indexOf(ItemType.SWORD_5)>-1) panel.profile.sword.gotoAndStop(5) else 
 				if(_global.game.loot.indexOf(ItemType.SWORD_6)>-1) panel.profile.sword.gotoAndStop(6) else panel.profile.sword.gotoAndStop(1);
@@ -4469,7 +4531,7 @@ package dungeonScreener {//2493
 				panel.profile.sword.gotoAndStop(1);
 				if(_global.game.staff.visible){
 					panel.profile.stat1.htmlText = ((panel.spell.visible)?"<font color='#888888'>":"")+"Wand: "+_global.game.playerGroup.bottomAttack+((panel.spell.visible)?"</font>":"");
-					if(_global.playerGroup.bottomAttack>3) panel.profile.staff.gotoAndStop(5) else panel.profile.staff.gotoAndStop(4);
+					if(_global.playerGroup.bottomAttack>4) panel.profile.staff.gotoAndStop(5) else panel.profile.staff.gotoAndStop(4);
 				} else {
 					panel.profile.stat1.htmlText = ((panel.spell.visible)?"<font color='#888888'>":"")+"Rod: "+_global.game.playerGroup.bottomAttack+((panel.spell.visible)?"</font>":"");
 					panel.profile.staff.gotoAndStop(3);
@@ -4504,7 +4566,7 @@ package dungeonScreener {//2493
 				if(_global.game.leftExp>=100000) resistance += 1;
 				if(_global.game.ankh.visible) resistance += 1;
 				if(_global.game.crown.visible) resistance += 1;
-				panel.profile.special.htmlText = "Resist: "+((!resistance)?"<font color='#555555'>":"")+space+space+resistance+((!resistance)?"</font>":"")+"<br/>"+((resistance<4)?"<font color='#555555'>Invulnerable</font>":"Invulnerable");
+				panel.profile.special.htmlText = "Resist: "+((!resistance)?"<font color='#555555'>":"")+space+space+resistance+((!resistance)?"</font>":"")+"<br/>"+((_global.game.loot.indexOf(ItemType.DIVINE_CROWN)==-1 && _global.game.leftExp<200000)?"<font color='#555555'>Auto-protect</font>":"Auto-protect");
 				panel.profile.stat3.htmlText = "Spell: "+((_global.game.playerGroup.leftUnit.skill+_global.game.playerGroup.cure.currentFrame>=5)?"Divine Aid":((_global.game.playerGroup.leftUnit.skill+_global.game.playerGroup.cure.currentFrame>=4)?"Restoration":((_global.game.playerGroup.leftUnit.skill+_global.game.playerGroup.cure.currentFrame>2)?"Heal":((_global.game.playerGroup.leftAction)?"Cure":"<font color='#555555'>No scrolls</font>")))+((_global.game.playerGroup.leftUnit.skill+_global.game.playerGroup.cure.currentFrame<5)?((_global.game.playerGroup.leftAction&&_options.revive)?"":""):""));
 				panel.profile.stat2.htmlText = "Power: "+(3+_global.game.playerGroup.leftUnit.skill+_global.game.playerGroup.cure.currentFrame + ((_global.game.loot.indexOf(ItemType.ANKH)>-1)?1:0) + ((_global.game.loot.indexOf(ItemType.DIVINE_CROWN)>-1)?1:0));
 				panel.profile.stat4.htmlText = "";
